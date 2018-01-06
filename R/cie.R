@@ -6,7 +6,7 @@ cfdr_cie <- function(.data, .fmla, .model = lm, ..., exposure = NULL, force_incl
 
  lhs <- as.character(.fmla)[2]
  rhs <- as.character(.fmla)[3]
- fmla_vars <- stringr::str_split(rhs, pattern = "\\+")[[1]] %>% stringr::str_replace_all(" ", "") # should make this better since assumes there's a space
+ fmla_vars <- stringr::str_split(rhs, pattern = "\\+")[[1]] %>% stringr::str_replace_all(" ", "")
  if (is.null(exposure)) {
    outcome <- fmla_vars[1]
  } else {
@@ -64,7 +64,7 @@ remove_var_from_fmla <- function(.fmla, .var) {
   .fmla <- as.character(.fmla)
   lhs <- as.character(.fmla)[2]
   rhs <- as.character(.fmla)[3]
-  fmla_vars <- stringr::str_split(rhs, pattern = " \\+ ")[[1]] # should make this better since assumes there's a space
+  fmla_vars <- stringr::str_split(rhs, pattern = "\\+")[[1]] %>% stringr::str_replace_all(" ", "")
   rhs <- fmla_vars[fmla_vars != .var]
   rhs <- paste(rhs, collapse = " + ")
   as.formula(paste(lhs, "~", rhs))
