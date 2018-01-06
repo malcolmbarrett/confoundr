@@ -7,19 +7,23 @@ x <- rnorm(n) + z
 noise <- rnorm(n)
 collider <- rnorm(n) + x + y
 y <- rnorm(n) + x + z
+y2 <- rbinom(n, 1, .5)
 df <- data.frame(y, x, z, noise, collider)
 
-lm(y ~ x + z + noise, data = noise) %>% broom::tidy() %>% mutate(p.value = round(p.value, 3))
-cfdr_cie(.)
-cfdr_cie <- function(.data, .fmla, .model, exposure = NULL, flow = "full", ...) {
+lm(y ~ x + z + noise, data = df) %>% broom::tidy() %>% mutate(p.value = round(p.value, 3))
+
+cfdr_cie(df, y ~ x + z + noise, .model = lm)
+cfdr_cie(df, y ~ x + z + noise, .model = lm)
+
+cfdr_cie <- function(.data, .fmla, .model = lm, ..., exposure = NULL, flow = "full") {
 
  lhs <- as.character(.fmla)[2]
  rhs <- as.character(.fmla)[3]
  fmla_vars <- stringr::str_split(rhs, pattern = " \\+ ")[[1]] # should make this better since assumes there's a space
  if (is.null(exposure)) {
-   if (!is.character(exposure)) stop("`exposure` must be a character vector")
    outcome <- fmla_vars[1]
  } else {
+   if (!is.character(exposure)) stop("`exposure` must be a character vector")
    outcome <- exposure
  }
  covars <- fmla_vars[fmla_vars != outcome]
