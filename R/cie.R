@@ -2,6 +2,21 @@ library(boot)
 library(dplyr)
 library(broom)
 
+#' Change in estimate
+#'
+#' @param .data data
+#' @param .fmla formula
+#' @param .model model
+#' @param ... args
+#' @param exposure e
+#' @param force_include g
+#' @param flow gg
+#' @param exponentiate gg
+#'
+#' @return .cfdr object
+#' @export
+#'
+#' @examples
 cfdr_cie <- function(.data, .fmla, .model = lm, ..., exposure = NULL, force_include = NULL, flow = "full", exponentiate = FALSE) {
 
  lhs <- as.character(.fmla)[2]
@@ -23,7 +38,7 @@ cfdr_cie <- function(.data, .fmla, .model = lm, ..., exposure = NULL, force_incl
                      exponentiate = exponentiate)
 }
  results <- purrr::map2_df(outcome, covars, .f, ...)
- cfdr_cie_results <- list(results = results, model = list(f = .model, model_args = ...), outcome = outcome, force_include = force_include)
+ cfdr_cie_results <- list(results = results, model = list(f = .model, model_args = list(...)), outcome = outcome, force_include = force_include)
  class(cfdr_cie_results) <- c("cfdr", "cfdr_cie")
  cfdr_cie_results
 }
