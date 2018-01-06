@@ -38,7 +38,7 @@ cfdr_cie <- function(.data, .fmla, .model = lm, ..., exposure = NULL, force_incl
                      exponentiate = exponentiate)
 }
  results <- purrr::map2_df(outcome, covars, .f, ...)
- cfdr_cie_results <- list(results = results, model = list(f = .model, model_args = list(...)), outcome = outcome, force_include = force_include)
+ cfdr_cie_results <- list(results = results, model = list(f = .model, formula = .fmla, data = .data, model_args = list(...), exposure = outcome, force_include = force_include))
  class(cfdr_cie_results) <- c("cfdr", "cfdr_cie")
  cfdr_cie_results
 }
@@ -76,12 +76,38 @@ cie <- function(.data, indices, .fmla, .x, .z, .model, ..., exponentiate = FALSE
 }
 
 remove_var_from_fmla <- function(.fmla, .var) {
-  .fmla <- as.character(.fmla)
+  if (length(.var) == 0) return(.fmla)
+  #.fmla <- as.character(.fmla)
   lhs <- as.character(.fmla)[2]
   rhs <- as.character(.fmla)[3]
   fmla_vars <- stringr::str_split(rhs, pattern = "\\+")[[1]] %>% stringr::str_replace_all(" ", "")
-  rhs <- fmla_vars[fmla_vars != .var]
+  rhs <- fmla_vars[!(fmla_vars %in% .var)]
+
+  rhs <- paste(rhs, collapse = " + ")
+
+  as.formula(paste(lhs, "~", rhs))
+}
+
+keep_var_in_fmla <- function(.fmla, .var) {
+  #.fmla <- as.character(.fmla)
+  lhs <- as.character(.fmla)[2]
+  rhs <- as.character(.fmla)[3]
+  fmla_vars <- stringr::str_split(rhs, pattern = "\\+")[[1]] %>% stringr::str_replace_all(" ", "")
+  rhs <- fmla_vars[fmla_vars %in% .var]
   rhs <- paste(rhs, collapse = " + ")
   as.formula(paste(lhs, "~", rhs))
 }
 
+cfdr_cie_plot <- function(.cfdr_cie, height = .15) {
+  p <- ggplot2::ggplot(.cfdr_cie$results,
+                       ggplot2::aes(x = pct_cie, y = z,
+                                    xmin = conf.low,
+                                    xmax = conf.high)) +
+    ggplot2::geom_point() +
+    ggplot2::geom_errorbarh(height = height) +
+    ggplot2::geom_vline(ggplot2::aes(xintercept = 0), linetype = "dashed") +
+    ggplot2::labs(x = "Percent Change in Coefficient", y = "Potential Confounder")
+
+  if (dplyr::n_distinct(.cfdr_cie$results$x) > 1) p <- p + ggplot2::facet_wrap(~x, scales = "free")
+  p
+}
