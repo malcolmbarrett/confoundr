@@ -27,7 +27,7 @@ cfdr_cv_elastic <- function(formula, data, x, no_shrink, alpha, ...) {
   }
 
   cfdr_glmnet <- list(model = .cv_model, results = .model)
-  class(cfdr_glmnet) <- "cfdr_glmnet"
+  class(cfdr_glmnet) <- c("cfdr", "cfdr_glmnet")
   cfdr_glmnet
 }
 
@@ -37,10 +37,6 @@ cfdr_cv_lasso <- function(data, formula, x = NULL, no_shrink = NULL, exponentiat
 
 cfdr_cv_ridge <- function(formula, data, x, no_shrink, ...) {
   cfdr_cv_elastic(formula, data, x, no_shrink, alpha = 0, ...)
-}
-
-print.cfdr_glmnet <- function(.cfdr_glmnet) {
-  .cfdr_glmnet$results
 }
 
 plot.cfdr_glmnet <- function(.cfdr_glmnet) {
