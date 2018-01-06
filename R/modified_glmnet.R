@@ -2,7 +2,7 @@
 
 #data <- simulate_data_set()
 
-cv_modified_elastic <- function(formula, data, x, no_shrink, alpha, ...) {
+cfdr_cv_elastic <- function(formula, data, x, no_shrink, alpha, ...) {
   #  add option to not use formula, per usual?
   #  add option to be more flexible with what isn't shrunk
   independent_vars <- model.matrix(formula, data = data)[, -1]
@@ -32,11 +32,11 @@ cv_modified_elastic <- function(formula, data, x, no_shrink, alpha, ...) {
 }
 
 cfdr_cv_lasso <- function(data, formula, x = NULL, no_shrink = NULL, exponentiate = FALSE, ...) {
-  cv_modified_elastic(formula, data, x, no_shrink, alpha = 1, ...)
+  cfdr_cv_elastic(formula, data, x, no_shrink, alpha = 1, ...)
 }
 
-cv_modified_ridge <- function(formula, data, x, no_shrink, ...) {
-  cv_modified_elastic(formula, data, x, no_shrink, alpha = 0, ...)
+cfdr_cv_ridge <- function(formula, data, x, no_shrink, ...) {
+  cfdr_cv_elastic(formula, data, x, no_shrink, alpha = 0, ...)
 }
 
 print.cfdr_glmnet <- function(.cfdr_glmnet) {
