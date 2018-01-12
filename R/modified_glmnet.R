@@ -2,7 +2,7 @@
 
 #data <- simulate_data_set()
 
-cfdr_cv_elastic <- function(formula, data, x, no_shrink, alpha, ...) {
+cfdr_cv_elastic <- function(formula, data, x, no_shrink, alpha, exponentiate = FALSE, ...) {
   #  add option to not use formula, per usual?
   #  add option to be more flexible with what isn't shrunk
   independent_vars <- model.matrix(formula, data = data)[, -1]
@@ -23,7 +23,7 @@ cfdr_cv_elastic <- function(formula, data, x, no_shrink, alpha, ...) {
   .model <- .cv_model$glmnet.fit %>% broom::tidy() %>% filter(lambda == .cv_model$lambda.min)
 
   if (exponentiate) {
-    .model <- .model %>% mutate(estimate = exp(estimate))
+    .model <- .model %>% dplyr::mutate(estimate = exp(estimate))
   }
 
   cfdr_glmnet <- list(model = .cv_model, results = .model)
@@ -31,12 +31,12 @@ cfdr_cv_elastic <- function(formula, data, x, no_shrink, alpha, ...) {
   cfdr_glmnet
 }
 
-cfdr_cv_lasso <- function(data, formula, x = NULL, no_shrink = NULL, exponentiate = FALSE, ...) {
-  cfdr_cv_elastic(formula, data, x, no_shrink, alpha = 1, ...)
+cfdr_cv_lasso <- function(formula, data, x = NULL, no_shrink = NULL, exponentiate = FALSE, ...) {
+  cfdr_cv_elastic(formula = formula, data = data, x = x, no_shrink = no_shrink, alpha = 1, exponentiate = exponentiate, ...)
 }
 
-cfdr_cv_ridge <- function(formula, data, x, no_shrink, ...) {
-  cfdr_cv_elastic(formula, data, x, no_shrink, alpha = 0, ...)
+cfdr_cv_ridge <- function(formula, data, x, no_shrink, exponentiate = FALSE, ...) {
+  cfdr_cv_elastic(formula = formula, data = data, x = x, no_shrink = no_shrink, alpha = 0, exponentiate = exponentiate, ...)
 }
 
 plot.cfdr_glmnet <- function(.cfdr_glmnet) {

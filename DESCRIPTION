@@ -16,4 +16,4 @@ Imports:
     ggplot2,
     purrr,
     dplyr,
-    hrbrthemes
+    stringr
